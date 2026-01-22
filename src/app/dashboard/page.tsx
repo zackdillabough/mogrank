@@ -84,7 +84,7 @@ export default async function CustomerDashboard() {
         <Card className="border-primary">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Active Boost Session</span>
+              <span>Active Session</span>
               <Badge className={statusColors[activeOrder.status]}>
                 {activeOrder.status.replace("_", " ")}
               </Badge>
@@ -162,7 +162,7 @@ export default async function CustomerDashboard() {
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">No orders yet</p>
               <Button asChild>
-                <Link href="/">Get Your First Boost</Link>
+                <Link href="/">Browse Packages</Link>
               </Button>
             </div>
           ) : (

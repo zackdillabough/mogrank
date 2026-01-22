@@ -30,7 +30,7 @@ export function CustomerNav({ user }: CustomerNavProps) {
 
   const navItems = [
     { href: "/dashboard", label: "My Orders", exact: true },
-    { href: "/", label: "Buy Boost", exact: true },
+    { href: "/", label: "Packages", exact: true },
   ]
 
   const avatarUrl = user.discordAvatar

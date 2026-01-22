@@ -84,19 +84,19 @@ export async function sendQueueUpdateDM(
 
   switch (update.type) {
     case "scheduled":
-      message = `Your **${update.packageName}** boost has been scheduled for **${update.appointmentTime}**! Make sure to be ready.`
+      message = `Your **${update.packageName}** session has been scheduled for **${update.appointmentTime}**! Make sure to be ready.`
       break
     case "room_code":
-      message = `Your boost session is ready! Join with room code: \`${update.roomCode}\`\n\nPackage: **${update.packageName}**`
+      message = `Your session is ready! Join with room code: \`${update.roomCode}\`\n\nPackage: **${update.packageName}**`
       break
     case "in_progress":
-      message = `Your **${update.packageName}** boost session has started! Stay AFK and enjoy the ride.`
+      message = `Your **${update.packageName}** session has started! Stay AFK and enjoy the ride.`
       break
     case "completed":
-      message = `Your **${update.packageName}** boost has been completed! Enjoy your new levels. Thanks for using mogrank!`
+      message = `Your **${update.packageName}** order is complete! Enjoy your new levels. Thanks for using mogrank!`
       break
     case "missed":
-      message = `You missed your scheduled **${update.packageName}** boost appointment. Please contact us to reschedule.`
+      message = `You missed your scheduled **${update.packageName}** session. Please contact us to reschedule.`
       break
   }
 
