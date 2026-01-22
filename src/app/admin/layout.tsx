@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { AdminNav } from "@/components/admin/admin-nav"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/admin/app-sidebar"
+import { AdminHeader } from "@/components/admin/admin-header"
 
 export default async function AdminLayout({
   children,
@@ -14,9 +16,12 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <AdminNav user={session.user} />
-      <main className="container mx-auto py-6 px-4">{children}</main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar user={session.user} />
+      <SidebarInset>
+        <AdminHeader />
+        <main className="flex-1 p-6">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
