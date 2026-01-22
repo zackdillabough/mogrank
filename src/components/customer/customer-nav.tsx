@@ -30,7 +30,7 @@ export function CustomerNav({ user }: CustomerNavProps) {
 
   const navItems = [
     { href: "/dashboard", label: "My Orders", exact: true },
-    { href: "/", label: "Buy Boost" },
+    { href: "/", label: "Buy Boost", exact: true },
   ]
 
   const avatarUrl = user.discordAvatar
@@ -38,7 +38,7 @@ export function CustomerNav({ user }: CustomerNavProps) {
     : null
 
   return (
-    <nav className="border-b bg-card">
+    <nav className="border-b">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">

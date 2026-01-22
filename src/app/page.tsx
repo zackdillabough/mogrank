@@ -4,6 +4,7 @@ import { PackageCard } from "@/components/package-card"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
+import { CustomerNav } from "@/components/customer/customer-nav"
 import Link from "next/link"
 
 async function getPackages() {
@@ -23,30 +24,28 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
-            <Logo className="h-8" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            {session?.user ? (
-              <>
-                <span className="text-sm text-muted-foreground">
-                  {session.user.discordUsername}
-                </span>
-                <Button asChild variant="outline">
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-              </>
-            ) : (
+      {session?.user ? (
+        <CustomerNav user={{
+          discordUsername: session.user.discordUsername,
+          discordAvatar: session.user.discordAvatar,
+          discordId: session.user.discordId,
+          isAdmin: session.user.isAdmin,
+        }} />
+      ) : (
+        <header className="border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <Link href="/">
+              <Logo className="h-8" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Button asChild>
                 <Link href="/login">Login with Discord</Link>
               </Button>
-            )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
