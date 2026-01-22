@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   ShoppingCart,
   ListOrdered,
+  Package,
   Settings,
   LogOut,
   Monitor,
@@ -36,6 +37,7 @@ import { LogoIcon } from "@/components/logo-icon"
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/packages", label: "Packages", icon: Package },
   { href: "/admin/queue", label: "Queue", icon: ListOrdered },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]

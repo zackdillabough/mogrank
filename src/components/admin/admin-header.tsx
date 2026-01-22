@@ -16,6 +16,7 @@ import {
 const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",
   "/admin/orders": "Orders",
+  "/admin/packages": "Packages",
   "/admin/queue": "Queue",
   "/admin/settings": "Settings",
 }
