@@ -26,7 +26,7 @@ export default async function LoginPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight">Welcome Back</h1>
           <p className="text-muted-foreground">
-            Sign in with Discord to manage your boost orders
+            Sign in with Discord to manage your orders
           </p>
         </div>
 
