@@ -31,7 +31,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Logo } from "@/components/logo"
+import { LogoIcon } from "@/components/logo-icon"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -63,7 +63,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/admin">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Logo className="h-4 w-4" />
+                  <LogoIcon className="size-6" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">mogrank</span>
