@@ -2,6 +2,8 @@ import { auth, signIn } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Logo } from "@/components/logo"
 import Link from "next/link"
 
 export default async function LoginPage() {
@@ -12,11 +14,14 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="mb-4 inline-block">
-            <img src="/mogrank_wordmark.svg" alt="mogrank" className="h-8" />
+          <Link href="/" className="mb-4 inline-flex justify-center">
+            <Logo className="h-8" />
           </Link>
           <CardTitle>Welcome Back</CardTitle>
           <CardDescription>

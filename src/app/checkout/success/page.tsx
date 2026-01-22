@@ -4,7 +4,7 @@ import Link from "next/link"
 
 export default function CheckoutSuccessPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <div className="text-6xl mb-4">🎉</div>

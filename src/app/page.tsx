@@ -2,6 +2,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin"
 import { auth } from "@/lib/auth"
 import { PackageCard } from "@/components/package-card"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Logo } from "@/components/logo"
 import Link from "next/link"
 
 async function getPackages() {
@@ -19,14 +21,15 @@ export default async function Home() {
   const [session, packages] = await Promise.all([auth(), getPackages()])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/">
-            <img src="/mogrank_wordmark.svg" alt="mogrank" className="h-8 translate-y-[3px]" />
+            <Logo className="h-8" />
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {session?.user ? (
               <>
                 <span className="text-sm text-muted-foreground">
@@ -102,7 +105,7 @@ export default async function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="container mx-auto px-4 py-16 bg-muted/50">
+      <section className="container mx-auto px-4 py-16 bg-muted/30 dark:bg-card/50">
         <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
         <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
           <div className="text-center">
@@ -147,7 +150,7 @@ export default async function Home() {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <img src="/mogrank_wordmark.svg" alt="mogrank" className="h-6 opacity-50 mx-auto" />
+          <Logo className="h-6 opacity-50 mx-auto" />
           <p className="mt-2">
             Questions? DM us on Discord
           </p>

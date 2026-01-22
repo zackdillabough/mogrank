@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { signOut } from "next-auth/react"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { Logo } from "@/components/logo"
 
 interface AdminNavProps {
   user: {
@@ -42,7 +44,7 @@ export function AdminNav({ user }: AdminNavProps) {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/admin">
-              <img src="/mogrank_wordmark.svg" alt="mogrank" className="h-6 translate-y-[2px]" />
+              <Logo className="h-6" />
             </Link>
 
             <div className="flex items-center gap-1">
@@ -69,7 +71,9 @@ export function AdminNav({ user }: AdminNavProps) {
             </div>
           </div>
 
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
@@ -94,7 +98,8 @@ export function AdminNav({ user }: AdminNavProps) {
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </nav>

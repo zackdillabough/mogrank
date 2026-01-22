@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation"
 import { useEffect, useState, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RampWidget } from "@/components/ramp-widget"
+import { Logo } from "@/components/logo"
 import Link from "next/link"
 
 interface Order {
@@ -82,11 +83,11 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Link href="/" className="mb-2 inline-block">
-            <img src="/mogrank_wordmark.svg" alt="mogrank" className="h-8" />
+          <Link href="/" className="mb-2 inline-flex justify-center">
+            <Logo className="h-8" />
           </Link>
           <CardTitle>Complete Your Purchase</CardTitle>
         </CardHeader>
