@@ -38,7 +38,7 @@ export function CustomerNav({ user }: CustomerNavProps) {
     : null
 
   return (
-    <nav className="border-b">
+    <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">

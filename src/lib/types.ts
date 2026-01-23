@@ -15,10 +15,10 @@ export type QueueStatus = 'new' | 'scheduled' | 'in_progress' | 'review' | 'fini
 export interface Package {
   id: string
   name: string
-  description: string
+  header: string
+  subtitle: string
+  description: string | null
   price: number // in USD
-  levels: number
-  duration_minutes: number | null
   image_url: string | null
   active: boolean
   created_at: string

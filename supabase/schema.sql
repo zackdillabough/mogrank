@@ -8,10 +8,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS packages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT NOT NULL,
+  header TEXT NOT NULL DEFAULT '',
+  subtitle TEXT NOT NULL DEFAULT '',
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
-  levels INTEGER NOT NULL,
-  duration_minutes INTEGER,
   image_url TEXT,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -83,11 +83,10 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- Insert default packages
-INSERT INTO packages (name, description, price, levels, duration_minutes) VALUES
-  ('Starter', '100 levels in ~15 minutes (AFK-friendly)', 5.00, 100, 15),
-  ('Standard', '250 levels in ~30 minutes (AFK-friendly)', 10.00, 250, 30),
-  ('Premium', '500 levels in ~45 minutes (AFK-friendly)', 18.00, 500, 45),
-  ('Ultimate', '1000 levels in ~60 minutes (AFK-friendly)', 30.00, 1000, 60)
+INSERT INTO packages (name, header, subtitle, description, price) VALUES
+  ('1 Prestige', '100', 'levels', '100 levels in ~15 minutes', 5.00),
+  ('5 Prestiges', '500', 'levels', '500 levels, may require multiple sessions', 20.00),
+  ('20 Prestiges', '2,000', 'levels', 'Max prestige — 2,000 levels, multiple sessions', 75.00)
 ON CONFLICT DO NOTHING;
 
 -- Insert default settings

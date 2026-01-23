@@ -25,10 +25,10 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState(pkg?.name || "")
+  const [header, setHeader] = useState(pkg?.header || "")
+  const [subtitle, setSubtitle] = useState(pkg?.subtitle || "")
   const [description, setDescription] = useState(pkg?.description || "")
   const [price, setPrice] = useState(pkg?.price?.toString() || "")
-  const [levels, setLevels] = useState(pkg?.levels?.toString() || "")
-  const [durationMinutes, setDurationMinutes] = useState(pkg?.duration_minutes?.toString() || "")
   const [imageUrl, setImageUrl] = useState(pkg?.image_url || "")
   const [active, setActive] = useState(pkg?.active ?? true)
 
@@ -42,10 +42,10 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
       const body = {
         ...(isEditing && { id: pkg.id }),
         name,
-        description,
+        header,
+        subtitle,
+        description: description || null,
         price: parseFloat(price),
-        levels: parseInt(levels),
-        duration_minutes: durationMinutes ? parseInt(durationMinutes) : null,
         image_url: imageUrl || null,
         active,
       }
@@ -72,10 +72,10 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
 
   const resetForm = () => {
     setName(pkg?.name || "")
+    setHeader(pkg?.header || "")
+    setSubtitle(pkg?.subtitle || "")
     setDescription(pkg?.description || "")
     setPrice(pkg?.price?.toString() || "")
-    setLevels(pkg?.levels?.toString() || "")
-    setDurationMinutes(pkg?.duration_minutes?.toString() || "")
     setImageUrl(pkg?.image_url || "")
     setActive(pkg?.active ?? true)
   }
@@ -88,44 +88,68 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Package" : "Add Package"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Starter"
-              required
-            />
-          </div>
+        <div className="grid grid-cols-2 gap-6">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. 1 Prestige"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g. 100 levels in ~15 minutes (AFK-friendly)"
-              rows={2}
-            />
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="header">Header</Label>
+                <Input
+                  id="header"
+                  value={header}
+                  onChange={(e) => setHeader(e.target.value)}
+                  placeholder="e.g. 100"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subtitle">Subtitle</Label>
+                <Input
+                  id="subtitle"
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  placeholder="e.g. levels"
+                  required
+                />
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL</Label>
-            <Input
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://example.com/image.jpg (optional)"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Shown when card is expanded (optional)"
+                rows={2}
+              />
+            </div>
 
-          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="imageUrl">Image URL</Label>
+              <Input
+                id="imageUrl"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg (optional)"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="price">Price ($)</Label>
               <Input
@@ -138,48 +162,56 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="levels">Levels</Label>
-              <Input
-                id="levels"
-                type="number"
-                min="1"
-                value={levels}
-                onChange={(e) => setLevels(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration (min)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="1"
-                value={durationMinutes}
-                onChange={(e) => setDurationMinutes(e.target.value)}
-                placeholder="Optional"
-              />
-            </div>
-          </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="active"
-              checked={active}
-              onCheckedChange={(checked) => setActive(checked === true)}
-            />
-            <Label htmlFor="active">Active (visible to customers)</Label>
-          </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="active"
+                checked={active}
+                onCheckedChange={(checked) => setActive(checked === true)}
+              />
+              <Label htmlFor="active">Active (visible to customers)</Label>
+            </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : isEditing ? "Save Changes" : "Create Package"}
-            </Button>
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : isEditing ? "Save Changes" : "Create Package"}
+              </Button>
+            </div>
+          </form>
+
+          {/* Live Preview */}
+          <div className="flex flex-col items-center justify-center">
+            <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wide">Preview</p>
+            <div className="w-[200px]">
+              <div className="bg-white dark:bg-zinc-100 p-2 pb-10 shadow-lg relative">
+                <div className="aspect-square bg-zinc-900 flex flex-col items-center justify-center p-3 relative overflow-hidden">
+                  {imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrl}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover opacity-30"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-radial-[at_center] from-black/60 via-black/30 to-transparent" />
+                  <div className="relative z-10 flex flex-col items-center text-center">
+                    <p className="text-3xl font-bold text-white drop-shadow-lg">
+                      {header || "—"}
+                    </p>
+                    <p className="text-sm text-zinc-300 mt-1">{subtitle || "—"}</p>
+                  </div>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between font-[family-name:var(--font-permanent-marker)]">
+                  <p className="text-zinc-800 text-sm">{name || "Name"}</p>
+                  <p className="text-zinc-800 text-sm">$ {price || "0"}</p>
+                </div>
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

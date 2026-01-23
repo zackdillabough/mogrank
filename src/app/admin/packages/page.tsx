@@ -72,9 +72,9 @@ export default function PackagesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Header</TableHead>
+              <TableHead>Subtitle</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Levels</TableHead>
-              <TableHead>Duration</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -90,9 +90,9 @@ export default function PackagesPage() {
               packages.map((pkg) => (
                 <TableRow key={pkg.id}>
                   <TableCell className="font-medium">{pkg.name}</TableCell>
+                  <TableCell>{pkg.header}</TableCell>
+                  <TableCell>{pkg.subtitle}</TableCell>
                   <TableCell>${pkg.price}</TableCell>
-                  <TableCell>{pkg.levels.toLocaleString()}</TableCell>
-                  <TableCell>{pkg.duration_minutes ? `~${pkg.duration_minutes} min` : "—"}</TableCell>
                   <TableCell>
                     <Badge variant={pkg.active ? "default" : "secondary"}>
                       {pkg.active ? "Active" : "Inactive"}
