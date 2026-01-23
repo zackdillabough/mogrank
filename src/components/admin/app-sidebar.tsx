@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   ListOrdered,
   Package,
+  HelpCircle,
   Settings,
   LogOut,
   Monitor,
@@ -39,6 +40,7 @@ const navItems = [
   { href: "/admin/queue", label: "Queue", icon: ListOrdered },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/packages", label: "Packages", icon: Package },
+  { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 

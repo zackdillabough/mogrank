@@ -44,7 +44,14 @@ export default async function LoginPage() {
         </form>
 
         <p className="text-sm text-muted-foreground">
-          By signing in, you agree to our terms of service
+          By signing in, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-foreground">
+            terms of service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline hover:text-foreground">
+            privacy policy
+          </Link>
         </p>
 
         <Link href="/" className="text-sm text-muted-foreground hover:underline inline-block">

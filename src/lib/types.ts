@@ -71,6 +71,15 @@ export interface User {
   updated_at: string
 }
 
+export interface FAQ {
+  id: string
+  question: string
+  answer: string
+  position: number
+  active: boolean
+  created_at: string
+}
+
 // Ramp Network webhook payload types
 export interface RampWebhookPayload {
   type: string

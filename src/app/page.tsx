@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin"
 import { auth } from "@/lib/auth"
 import { PackageCard } from "@/components/package-card"
+import { FAQAccordion } from "@/components/faq-accordion"
 import { GhostOrbs } from "@/components/ghost-orbs"
 import { ScrollHeader } from "@/components/scroll-header"
 import { Button } from "@/components/ui/button"
@@ -19,8 +20,19 @@ async function getPackages() {
   return data || []
 }
 
+async function getFaqs() {
+  const supabase = getSupabaseAdmin()
+  const { data } = await supabase
+    .from("faqs")
+    .select("*")
+    .eq("active", true)
+    .order("position", { ascending: true })
+
+  return data || []
+}
+
 export default async function Home() {
-  const [session, packages] = await Promise.all([auth(), getPackages()])
+  const [session, packages, faqs] = await Promise.all([auth(), getPackages(), getFaqs()])
   const isLoggedIn = !!session?.user
 
   return (
@@ -147,6 +159,16 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* FAQ */}
+        {faqs.length > 0 && (
+          <section id="faq" className="container mx-auto px-4 py-16">
+            <h2 className="text-3xl font-bold text-center mb-8">FAQ</h2>
+            <div className="max-w-2xl mx-auto">
+              <FAQAccordion faqs={faqs} />
+            </div>
+          </section>
+        )}
+
         {/* Footer */}
         <footer className="border-t py-8">
           <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
@@ -154,6 +176,14 @@ export default async function Home() {
             <p className="mt-2">
               Questions? DM us on Discord
             </p>
+            <div className="mt-2 flex justify-center gap-4">
+              <Link href="/terms" className="hover:underline">
+                Terms of Service
+              </Link>
+              <Link href="/privacy" className="hover:underline">
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </footer>
       </div>
