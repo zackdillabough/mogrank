@@ -92,7 +92,7 @@ export default function PackagesPage() {
                   <TableCell className="font-medium">{pkg.name}</TableCell>
                   <TableCell>${pkg.price}</TableCell>
                   <TableCell>{pkg.levels.toLocaleString()}</TableCell>
-                  <TableCell>~{pkg.duration_minutes} min</TableCell>
+                  <TableCell>{pkg.duration_minutes ? `~${pkg.duration_minutes} min` : "—"}</TableCell>
                   <TableCell>
                     <Badge variant={pkg.active ? "default" : "secondary"}>
                       {pkg.active ? "Active" : "Inactive"}

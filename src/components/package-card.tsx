@@ -61,10 +61,12 @@ export function PackageCard({ package: pkg, isLoggedIn }: PackageCardProps) {
             <span className="text-lg font-normal text-muted-foreground ml-1">levels</span>
           </p>
           <p className="text-sm text-muted-foreground">{pkg.description}</p>
-          <p className="text-sm">
-            <span className="text-muted-foreground">Duration:</span>{" "}
-            <span className="font-medium">~{pkg.duration_minutes} min</span>
-          </p>
+          {pkg.duration_minutes && (
+            <p className="text-sm">
+              <span className="text-muted-foreground">Duration:</span>{" "}
+              <span className="font-medium">~{pkg.duration_minutes} min</span>
+            </p>
+          )}
         </div>
       </CardContent>
       <CardFooter>

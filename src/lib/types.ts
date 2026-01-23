@@ -18,7 +18,7 @@ export interface Package {
   description: string
   price: number // in USD
   levels: number
-  duration_minutes: number
+  duration_minutes: number | null
   active: boolean
   created_at: string
 }

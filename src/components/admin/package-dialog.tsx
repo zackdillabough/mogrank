@@ -28,7 +28,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
   const [description, setDescription] = useState(pkg?.description || "")
   const [price, setPrice] = useState(pkg?.price?.toString() || "")
   const [levels, setLevels] = useState(pkg?.levels?.toString() || "")
-  const [durationMinutes, setDurationMinutes] = useState(pkg?.duration_minutes?.toString() || "15")
+  const [durationMinutes, setDurationMinutes] = useState(pkg?.duration_minutes?.toString() || "")
   const [active, setActive] = useState(pkg?.active ?? true)
 
   const isEditing = !!pkg
@@ -44,7 +44,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
         description,
         price: parseFloat(price),
         levels: parseInt(levels),
-        duration_minutes: parseInt(durationMinutes),
+        duration_minutes: durationMinutes ? parseInt(durationMinutes) : null,
         active,
       }
 
@@ -73,7 +73,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
     setDescription(pkg?.description || "")
     setPrice(pkg?.price?.toString() || "")
     setLevels(pkg?.levels?.toString() || "")
-    setDurationMinutes(pkg?.duration_minutes?.toString() || "15")
+    setDurationMinutes(pkg?.duration_minutes?.toString() || "")
     setActive(pkg?.active ?? true)
   }
 
@@ -144,7 +144,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
                 min="1"
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(e.target.value)}
-                required
+                placeholder="Optional"
               />
             </div>
           </div>

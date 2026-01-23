@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS packages (
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
   levels INTEGER NOT NULL,
-  duration_minutes INTEGER NOT NULL DEFAULT 15,
+  duration_minutes INTEGER,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
