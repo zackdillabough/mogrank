@@ -19,6 +19,7 @@ export interface Package {
   price: number // in USD
   levels: number
   duration_minutes: number | null
+  image_url: string | null
   active: boolean
   created_at: string
 }

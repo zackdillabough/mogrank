@@ -29,6 +29,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
   const [price, setPrice] = useState(pkg?.price?.toString() || "")
   const [levels, setLevels] = useState(pkg?.levels?.toString() || "")
   const [durationMinutes, setDurationMinutes] = useState(pkg?.duration_minutes?.toString() || "")
+  const [imageUrl, setImageUrl] = useState(pkg?.image_url || "")
   const [active, setActive] = useState(pkg?.active ?? true)
 
   const isEditing = !!pkg
@@ -45,6 +46,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
         price: parseFloat(price),
         levels: parseInt(levels),
         duration_minutes: durationMinutes ? parseInt(durationMinutes) : null,
+        image_url: imageUrl || null,
         active,
       }
 
@@ -74,6 +76,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
     setPrice(pkg?.price?.toString() || "")
     setLevels(pkg?.levels?.toString() || "")
     setDurationMinutes(pkg?.duration_minutes?.toString() || "")
+    setImageUrl(pkg?.image_url || "")
     setActive(pkg?.active ?? true)
   }
 
@@ -109,6 +112,16 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. 100 levels in ~15 minutes (AFK-friendly)"
               rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">Image URL</Label>
+            <Input
+              id="imageUrl"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://example.com/image.jpg (optional)"
             />
           </div>
 

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS packages (
   price DECIMAL(10, 2) NOT NULL,
   levels INTEGER NOT NULL,
   duration_minutes INTEGER,
+  image_url TEXT,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

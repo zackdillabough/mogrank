@@ -96,9 +96,9 @@ export default async function Home() {
       {/* Packages */}
       <section id="packages" className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-8">Choose Your Package</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {packages.map((pkg) => (
-            <PackageCard key={pkg.id} package={pkg} isLoggedIn={!!session?.user} />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-4xl mx-auto py-4">
+          {packages.map((pkg, index) => (
+            <PackageCard key={pkg.id} package={pkg} index={index} isLoggedIn={!!session?.user} />
           ))}
         </div>
       </section>

@@ -2,18 +2,22 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { Package } from "@/lib/types"
 
+const rotations = ["-2deg", "1.5deg", "-1deg", "2deg", "-0.5deg", "1deg"]
+
 interface PackageCardProps {
   package: Package
+  index?: number
   isLoggedIn: boolean
 }
 
-export function PackageCard({ package: pkg, isLoggedIn }: PackageCardProps) {
+export function PackageCard({ package: pkg, index = 0, isLoggedIn }: PackageCardProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+
+  const rotation = rotations[index % rotations.length]
 
   const handleBuy = async () => {
     if (!isLoggedIn) {
@@ -23,7 +27,6 @@ export function PackageCard({ package: pkg, isLoggedIn }: PackageCardProps) {
 
     setLoading(true)
     try {
-      // Create order
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,8 +38,6 @@ export function PackageCard({ package: pkg, isLoggedIn }: PackageCardProps) {
       }
 
       const { order, walletAddress } = await response.json()
-
-      // Redirect to checkout page
       router.push(`/checkout?orderId=${order.id}&wallet=${walletAddress}`)
     } catch (error) {
       console.error("Error creating order:", error)
@@ -47,38 +48,50 @@ export function PackageCard({ package: pkg, isLoggedIn }: PackageCardProps) {
   }
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>{pkg.name}</span>
-          <span className="text-2xl font-bold">${pkg.price}</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1">
-        <div className="space-y-2">
-          <p className="text-3xl font-bold text-primary">
-            {pkg.levels.toLocaleString()}
-            <span className="text-lg font-normal text-muted-foreground ml-1">levels</span>
-          </p>
-          <p className="text-sm text-muted-foreground">{pkg.description}</p>
-          {pkg.duration_minutes && (
-            <p className="text-sm">
-              <span className="text-muted-foreground">Duration:</span>{" "}
-              <span className="font-medium">~{pkg.duration_minutes} min</span>
-            </p>
+    <div
+      className="group transition-transform hover:scale-105 hover:rotate-0 cursor-pointer"
+      style={{ rotate: rotation }}
+    >
+      {/* Polaroid frame */}
+      <div className="bg-white dark:bg-zinc-100 p-3 pb-14 shadow-lg relative">
+        {/* Photo area */}
+        <div className="aspect-square bg-zinc-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+          {pkg.image_url && (
+            <img
+              src={pkg.image_url}
+              alt={pkg.name}
+              className="absolute inset-0 w-full h-full object-cover opacity-30"
+            />
           )}
+          <div className="relative z-10 flex flex-col items-center">
+            <p className="text-4xl font-bold text-white">
+              {pkg.levels.toLocaleString()}
+            </p>
+            <p className="text-sm text-zinc-400 mt-1">levels</p>
+            {pkg.duration_minutes && (
+              <p className="text-xs text-zinc-500 mt-2">~{pkg.duration_minutes} min</p>
+            )}
+            <p className="text-lg font-bold text-white mt-3">${pkg.price}</p>
+          </div>
         </div>
-      </CardContent>
-      <CardFooter>
+
+        {/* Caption area - like the map names in Phasmophobia */}
+        <p className="absolute bottom-4 left-0 right-0 text-center text-zinc-800 font-handwriting text-lg font-medium italic">
+          {pkg.name}
+        </p>
+      </div>
+
+      {/* Buy button appears on hover */}
+      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           className="w-full"
-          size="lg"
+          size="sm"
           onClick={handleBuy}
           disabled={loading}
         >
           {loading ? "Creating Order..." : isLoggedIn ? "Buy Now" : "Login to Buy"}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }
