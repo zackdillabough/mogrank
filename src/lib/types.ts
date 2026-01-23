@@ -21,6 +21,7 @@ export interface Package {
   price: number // in USD
   image_url: string | null
   active: boolean
+  position: number
   created_at: string
 }
 

@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { signOut } from "next-auth/react"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
 
 interface CustomerNavProps {
@@ -71,7 +70,6 @@ export function CustomerNav({ user }: CustomerNavProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">

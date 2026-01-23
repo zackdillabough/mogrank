@@ -1,7 +1,6 @@
 import { auth, signIn } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
 import Link from "next/link"
 
@@ -14,10 +13,6 @@ export default async function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-
       <div className="w-full max-w-sm space-y-6 text-center">
         <Link href="/" className="inline-flex justify-center">
           <Logo className="h-10" />

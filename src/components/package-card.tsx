@@ -201,9 +201,9 @@ function PolaroidFrame({ pkg, expanded = false }: { pkg: Package; expanded?: boo
           )}
         </div>
       </div>
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between font-[family-name:var(--font-permanent-marker)]">
-        <p className="text-zinc-800 text-lg">{pkg.name}</p>
-        <p className="text-zinc-800 text-lg">$ {pkg.price}</p>
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 font-[family-name:var(--font-permanent-marker)]">
+        <p className="text-zinc-800 text-lg truncate">{pkg.name}</p>
+        <p className="text-zinc-800 text-lg shrink-0">$ {Number(pkg.price).toFixed(2)}</p>
       </div>
     </div>
   )

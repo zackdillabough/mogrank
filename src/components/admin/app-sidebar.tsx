@@ -36,9 +36,9 @@ import { LogoIcon } from "@/components/logo-icon"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/queue", label: "Queue", icon: ListOrdered },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/packages", label: "Packages", icon: Package },
-  { href: "/admin/queue", label: "Queue", icon: ListOrdered },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 

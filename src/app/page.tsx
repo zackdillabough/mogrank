@@ -14,7 +14,7 @@ async function getPackages() {
     .from("packages")
     .select("*")
     .eq("active", true)
-    .order("price", { ascending: true })
+    .order("position", { ascending: true })
 
   return data || []
 }
@@ -95,9 +95,11 @@ export default async function Home() {
         {/* Packages */}
         <section id="packages" className="container mx-auto px-4 py-16">
           <h2 className="text-3xl font-bold text-center mb-8">Choose Your Package</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-4xl mx-auto py-4">
+          <div className="flex flex-wrap justify-center gap-10 max-w-4xl mx-auto py-4">
             {packages.map((pkg, index) => (
-              <PackageCard key={pkg.id} package={pkg} index={index} isLoggedIn={isLoggedIn} />
+              <div key={pkg.id} className="w-full sm:w-[calc(50%-1.25rem)] lg:w-[calc(33.333%-1.75rem)]">
+                <PackageCard package={pkg} index={index} isLoggedIn={isLoggedIn} />
+              </div>
             ))}
           </div>
         </section>

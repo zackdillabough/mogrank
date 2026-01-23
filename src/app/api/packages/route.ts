@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       query = query.eq("active", true)
     }
 
-    const { data: packages, error } = await query.order("price", { ascending: true })
+    const { data: packages, error } = await query.order("position", { ascending: true })
 
     if (error) {
       console.error("Error fetching packages:", error)

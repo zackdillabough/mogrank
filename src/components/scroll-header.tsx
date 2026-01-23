@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
 
 interface ScrollHeaderProps {
@@ -41,7 +40,6 @@ export function ScrollHeader({ isLoggedIn, user }: ScrollHeaderProps) {
           <Logo className="h-7" />
         </Link>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           {isLoggedIn && user ? (
             <Link href="/dashboard" className="flex items-center gap-2">
               <Button size="sm">My Orders</Button>
