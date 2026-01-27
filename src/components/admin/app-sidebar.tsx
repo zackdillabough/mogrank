@@ -8,6 +8,7 @@ import {
   ListOrdered,
   Package,
   HelpCircle,
+  Ticket,
   Settings,
   LogOut,
   Monitor,
@@ -41,6 +42,7 @@ const navItems = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/packages", label: "Packages", icon: Package },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
+  { href: "/admin/discounts", label: "Discounts", icon: Ticket },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
@@ -71,7 +73,9 @@ export function AppSidebar({ user }: AppSidebarProps) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">mogrank</span>
-                  <span className="truncate text-xs text-muted-foreground">Admin</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {process.env.NEXT_PUBLIC_STRIPE_MODE === "test" ? "Admin · TEST" : "Admin"}
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>

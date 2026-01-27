@@ -32,22 +32,21 @@ CREATE TABLE IF NOT EXISTS users (
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  ramp_order_id TEXT UNIQUE,
+  stripe_session_id TEXT UNIQUE,
+  stripe_payment_intent_id TEXT,
   discord_id TEXT,
   discord_username TEXT,
   discord_avatar TEXT,
   package_id UUID REFERENCES packages(id),
   package_name TEXT NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending_payment',
-  wallet_address TEXT,
-  crypto_amount TEXT,
-  crypto_currency TEXT,
+  refunded_amount DECIMAL(10, 2),
+  status TEXT NOT NULL DEFAULT 'in_queue',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   paid_at TIMESTAMPTZ,
   CONSTRAINT valid_status CHECK (status IN (
-    'pending_payment', 'paid', 'in_queue', 'scheduled',
+    'in_queue', 'scheduled',
     'in_progress', 'review', 'completed', 'missed', 'dispute', 'refunded'
   ))
 );
@@ -151,7 +150,8 @@ CREATE TRIGGER update_settings_updated_at
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_discord_id ON orders(discord_id);
-CREATE INDEX IF NOT EXISTS idx_orders_ramp_order_id ON orders(ramp_order_id);
+CREATE INDEX IF NOT EXISTS idx_orders_stripe_session_id ON orders(stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_orders_stripe_payment_intent_id ON orders(stripe_payment_intent_id);
 CREATE INDEX IF NOT EXISTS idx_queue_status ON queue(status);
 CREATE INDEX IF NOT EXISTS idx_queue_order_id ON queue(order_id);
 CREATE INDEX IF NOT EXISTS idx_queue_discord_id ON queue(discord_id);

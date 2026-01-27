@@ -115,14 +115,44 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-muted-foreground">Ramp Webhook URL</Label>
+            <Label className="text-muted-foreground">Stripe Mode</Label>
+            <div className="mt-1">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                process.env.NEXT_PUBLIC_STRIPE_MODE === "test"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-green-100 text-green-800"
+              }`}>
+                {process.env.NEXT_PUBLIC_STRIPE_MODE === "test" ? "Test Mode" : "Live Mode"}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-muted-foreground">Stripe Webhook URL</Label>
             <code className="block mt-1 p-2 bg-muted rounded text-sm">
-              {typeof window !== "undefined" ? `${window.location.origin}/api/ramp-webhook` : "/api/ramp-webhook"}
+              {typeof window !== "undefined" ? `${window.location.origin}/api/stripe-webhook` : "/api/stripe-webhook"}
             </code>
             <p className="text-xs text-muted-foreground mt-1">
-              Add this URL to your Ramp Network webhook settings
+              Add this URL to your Stripe Dashboard &gt; Developers &gt; Webhooks
             </p>
           </div>
+
+          {process.env.NEXT_PUBLIC_STRIPE_MODE === "test" && (
+            <div>
+              <Label className="text-muted-foreground">Test Card Numbers</Label>
+              <div className="mt-1 space-y-1">
+                <code className="block p-2 bg-muted rounded text-sm">
+                  4242 4242 4242 4242 — Succeeds
+                </code>
+                <code className="block p-2 bg-muted rounded text-sm">
+                  4000 0000 0000 0002 — Declines
+                </code>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Use any future exp date, any CVC, any ZIP
+              </p>
+            </div>
+          )}
 
           <div>
             <Label className="text-muted-foreground">Cron Job URL</Label>

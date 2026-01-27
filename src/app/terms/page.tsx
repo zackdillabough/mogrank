@@ -59,6 +59,7 @@ export default function TermsPage() {
               <p>6.2. Digital Services are eligible for refund only if the service has not been initiated. This includes contact from our team, scheduling arrangements, or any work begun on your order.</p>
               <p>6.3. Once a Digital Service has been started, no refunds will be issued regardless of completion percentage.</p>
               <p>6.4. Refund requests must be submitted via Discord before service has been initiated.</p>
+              <p>6.5. Refunds are issued minus payment processing fees (approximately 2.9% + $0.30) unless otherwise determined at our discretion.</p>
             </div>
           </section>
 

@@ -7,7 +7,7 @@ A web application for managing a Phasmophobia game boosting service. Customers c
 - **Customer Portal**: Browse packages, purchase boosts, track order status and queue position
 - **Admin Dashboard**: Kanban board for queue management, order history, statistics
 - **Discord Integration**: OAuth login + DM notifications for order updates
-- **Payment Processing**: Ramp Network integration for fiat-to-crypto payments (USDC on Solana)
+- **Payment Processing**: Stripe Checkout with discount codes, refunds, and email receipts
 - **Real-time Updates**: Automated queue progression via Vercel cron jobs
 
 ## Tech Stack
@@ -17,7 +17,7 @@ A web application for managing a Phasmophobia game boosting service. Customers c
 - **Auth**: NextAuth v5 with Discord OAuth
 - **UI**: shadcn/ui + Tailwind CSS
 - **Drag & Drop**: @dnd-kit for Kanban board
-- **Payments**: Ramp Network SDK
+- **Payments**: Stripe Checkout Sessions
 - **Hosting**: Vercel
 
 ## Getting Started
@@ -28,7 +28,7 @@ A web application for managing a Phasmophobia game boosting service. Customers c
 - pnpm
 - Supabase account
 - Discord application (OAuth + Bot)
-- Ramp Network API key (optional for testing)
+- Stripe account (test mode works without verification)
 
 ### Installation
 
@@ -69,11 +69,13 @@ ADMIN_DISCORD_ID=
 # Cron
 CRON_SECRET=
 
-# Payments
-WALLET_ADDRESS=
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Stripe
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_TEST_SECRET_KEY=
+STRIPE_TEST_WEBHOOK_SECRET=
+STRIPE_MODE=test
+NEXT_PUBLIC_STRIPE_MODE=test
 ```
 
 ### Database Setup

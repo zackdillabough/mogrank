@@ -7,8 +7,6 @@ import { format, formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 
 const statusColors: Record<string, string> = {
-  pending_payment: "bg-yellow-100 text-yellow-800",
-  paid: "bg-green-100 text-green-800",
   in_queue: "bg-blue-100 text-blue-800",
   scheduled: "bg-indigo-100 text-indigo-800",
   in_progress: "bg-orange-100 text-orange-800",
@@ -153,7 +151,7 @@ export default async function CustomerDashboard() {
       )}
 
       {/* Order History */}
-      <Card>
+      <Card className="bg-background">
         <CardHeader>
           <CardTitle>Order History</CardTitle>
         </CardHeader>
@@ -170,7 +168,7 @@ export default async function CustomerDashboard() {
               {orders.map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between p-4 border rounded-lg bg-muted"
                 >
                   <div className="space-y-1">
                     <p className="font-medium">{order.package_name}</p>

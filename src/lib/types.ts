@@ -1,6 +1,4 @@
 export type OrderStatus =
-  | 'pending_payment'
-  | 'paid'
   | 'in_queue'
   | 'scheduled'
   | 'in_progress'
@@ -27,17 +25,16 @@ export interface Package {
 
 export interface Order {
   id: string
-  ramp_order_id: string | null
+  stripe_session_id: string | null
+  stripe_payment_intent_id: string | null
   discord_id: string | null
   discord_username: string | null
   discord_avatar: string | null
   package_id: string
   package_name: string
   amount: number
+  refunded_amount: number | null
   status: OrderStatus
-  wallet_address: string | null
-  crypto_amount: string | null
-  crypto_currency: string | null
   created_at: string
   updated_at: string
   paid_at: string | null
@@ -80,34 +77,3 @@ export interface FAQ {
   created_at: string
 }
 
-// Ramp Network webhook payload types
-export interface RampWebhookPayload {
-  type: string
-  purchase: {
-    id: string
-    endTime: string | null
-    asset: {
-      symbol: string
-      chain: string
-      type: string
-      address: string | null
-      name: string
-      decimals: number
-    }
-    receiverAddress: string
-    cryptoAmount: string
-    fiatCurrency: string
-    fiatValue: number
-    assetExchangeRate: number
-    baseRampFee: number
-    networkFee: number
-    appliedFee: number
-    paymentMethodType: string
-    finalTxHash: string | null
-    createdAt: string
-    updatedAt: string
-    status: 'INITIALIZED' | 'PAYMENT_STARTED' | 'PAYMENT_IN_PROGRESS' | 'PAYMENT_FAILED' | 'PAYMENT_EXECUTED' | 'FIAT_SENT' | 'FIAT_RECEIVED' | 'RELEASING' | 'RELEASED' | 'EXPIRED' | 'CANCELLED'
-    escrowAddress: string | null
-    escrowDetailsHash: string | null
-  }
-}

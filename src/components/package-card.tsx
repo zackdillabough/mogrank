@@ -63,21 +63,21 @@ export function PackageCard({ package: pkg, index = 0, isLoggedIn }: PackageCard
 
     setLoading(true)
     try {
-      const response = await fetch("/api/orders", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packageId: pkg.id }),
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create order")
+        throw new Error("Failed to create checkout session")
       }
 
-      const { order, walletAddress } = await response.json()
-      router.push(`/checkout?orderId=${order.id}&wallet=${walletAddress}`)
+      const { url } = await response.json()
+      window.location.href = url
     } catch (error) {
-      console.error("Error creating order:", error)
-      alert("Failed to create order. Please try again.")
+      console.error("Error starting checkout:", error)
+      alert("Failed to start checkout. Please try again.")
     } finally {
       setLoading(false)
     }
