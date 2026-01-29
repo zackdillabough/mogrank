@@ -27,12 +27,12 @@ interface KanbanBoardProps {
   initialItems: QueueItem[]
 }
 
-const columns: { id: QueueStatus; title: string; color: string }[] = [
-  { id: "new", title: "New", color: "bg-slate-100 dark:bg-slate-800" },
-  { id: "scheduled", title: "Scheduled", color: "bg-blue-100 dark:bg-blue-900" },
-  { id: "in_progress", title: "In Progress", color: "bg-orange-100 dark:bg-orange-900" },
-  { id: "review", title: "Review", color: "bg-purple-100 dark:bg-purple-900" },
-  { id: "finished", title: "Finished", color: "bg-emerald-100 dark:bg-emerald-900" },
+const columns: { id: QueueStatus; title: string; borderColor: string; dotColor: string; ringColor: string }[] = [
+  { id: "new", title: "New", borderColor: "border-slate-500", dotColor: "bg-slate-500", ringColor: "ring-slate-500" },
+  { id: "scheduled", title: "Scheduled", borderColor: "border-blue-500", dotColor: "bg-blue-500", ringColor: "ring-blue-500" },
+  { id: "in_progress", title: "In Progress", borderColor: "border-orange-500", dotColor: "bg-orange-500", ringColor: "ring-orange-500" },
+  { id: "review", title: "Review", borderColor: "border-purple-500", dotColor: "bg-purple-500", ringColor: "ring-purple-500" },
+  { id: "finished", title: "Finished", borderColor: "border-emerald-500", dotColor: "bg-emerald-500", ringColor: "ring-emerald-500" },
 ]
 
 export function KanbanBoard({ initialItems }: KanbanBoardProps) {
@@ -224,7 +224,9 @@ export function KanbanBoard({ initialItems }: KanbanBoardProps) {
                 <KanbanColumn
                   id={column.id}
                   title={column.title}
-                  color={column.color}
+                  borderColor={column.borderColor}
+                  dotColor={column.dotColor}
+                  ringColor={column.ringColor}
                   count={columnItems.length}
                 >
                   {columnItems.map((item) => (

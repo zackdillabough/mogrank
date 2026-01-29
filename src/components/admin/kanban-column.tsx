@@ -7,7 +7,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 interface KanbanColumnProps {
   id: string
   title: string
-  color: string
+  borderColor: string
+  dotColor: string
+  ringColor: string
   count: number
   children: React.ReactNode
 }
@@ -15,7 +17,9 @@ interface KanbanColumnProps {
 export function KanbanColumn({
   id,
   title,
-  color,
+  borderColor,
+  dotColor,
+  ringColor,
   count,
   children,
 }: KanbanColumnProps) {
@@ -25,22 +29,25 @@ export function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-col rounded-lg border",
-        color,
-        isOver && "ring-2 ring-primary ring-offset-2"
+        "flex flex-col rounded-lg border-2 bg-muted/30",
+        borderColor,
+        isOver && ["ring-2 bg-muted/50", ringColor]
       )}
     >
-      <div className="p-3 border-b">
+      <div className="px-3 py-2 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">{title}</h3>
-          <span className="text-sm text-muted-foreground bg-background/50 px-2 py-0.5 rounded-full">
+          <div className="flex items-center gap-2">
+            <span className={cn("w-2 h-2 rounded-full", dotColor)} />
+            <h3 className="font-medium text-sm">{title}</h3>
+          </div>
+          <span className="text-xs text-muted-foreground bg-background px-1.5 py-0.5 rounded">
             {count}
           </span>
         </div>
       </div>
 
-      <ScrollArea className="flex-1 p-2">
-        <div className="space-y-2 min-h-[200px]">{children}</div>
+      <ScrollArea className="flex-1">
+        <div className="p-2 space-y-2 min-h-[200px]">{children}</div>
       </ScrollArea>
     </div>
   )
