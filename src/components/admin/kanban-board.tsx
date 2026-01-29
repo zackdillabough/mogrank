@@ -20,6 +20,7 @@ import {
 import { KanbanColumn } from "./kanban-column"
 import { KanbanCard } from "./kanban-card"
 import { QueueItemDialog } from "./queue-item-dialog"
+import { ScheduleDialog } from "./schedule-dialog"
 import type { QueueItem, QueueStatus } from "@/lib/types"
 
 interface KanbanBoardProps {
@@ -39,6 +40,8 @@ export function KanbanBoard({ initialItems }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [selectedItem, setSelectedItem] = useState<QueueItem | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false)
+  const [pendingScheduleItem, setPendingScheduleItem] = useState<QueueItem | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -87,6 +90,14 @@ export function KanbanBoard({ initialItems }: KanbanBoardProps) {
     }
 
     if (activeItem.status !== targetStatus) {
+      // If moving to scheduled, show the schedule dialog
+      if (targetStatus === "scheduled") {
+        setPendingScheduleItem(activeItem)
+        setScheduleDialogOpen(true)
+        setActiveId(null)
+        return
+      }
+
       // Update local state
       setItems((prev) =>
         prev.map((item) =>
@@ -116,6 +127,45 @@ export function KanbanBoard({ initialItems }: KanbanBoardProps) {
     }
 
     setActiveId(null)
+  }
+
+  const handleScheduleConfirm = async (itemId: string, appointmentTime: string) => {
+    // Update local state
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId
+          ? { ...item, status: "scheduled" as QueueStatus, appointment_time: appointmentTime }
+          : item
+      )
+    )
+
+    // Update server
+    try {
+      const response = await fetch("/api/queue/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: itemId,
+          status: "scheduled",
+          appointment_time: appointmentTime,
+        }),
+      })
+
+      if (!response.ok) {
+        setItems(initialItems)
+      }
+    } catch (error) {
+      console.error("Failed to schedule queue item:", error)
+      setItems(initialItems)
+    }
+
+    setScheduleDialogOpen(false)
+    setPendingScheduleItem(null)
+  }
+
+  const handleScheduleCancel = () => {
+    setScheduleDialogOpen(false)
+    setPendingScheduleItem(null)
   }
 
   const handleItemClick = (item: QueueItem) => {
@@ -202,6 +252,14 @@ export function KanbanBoard({ initialItems }: KanbanBoardProps) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onUpdate={handleItemUpdate}
+      />
+
+      <ScheduleDialog
+        item={pendingScheduleItem}
+        open={scheduleDialogOpen}
+        onOpenChange={setScheduleDialogOpen}
+        onSchedule={handleScheduleConfirm}
+        onCancel={handleScheduleCancel}
       />
     </>
   )
