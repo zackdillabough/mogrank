@@ -2,7 +2,6 @@
 
 import { useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface KanbanColumnProps {
   id: string
@@ -29,7 +28,7 @@ export function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-col rounded-lg border-2 bg-muted/30",
+        "flex flex-col rounded-lg border-2 bg-muted/30 min-w-0 overflow-hidden",
         borderColor,
         isOver && ["ring-2 bg-muted/50", ringColor]
       )}
@@ -46,9 +45,9 @@ export function KanbanColumn({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-2 space-y-2 min-h-[200px]">{children}</div>
-      </ScrollArea>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2">
+        <div className="space-y-2 min-h-[200px]">{children}</div>
+      </div>
     </div>
   )
 }

@@ -34,14 +34,14 @@ export function KanbanCard({ item, isDragging, onClick }: KanbanCardProps) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-pointer hover:shadow-md transition-shadow py-0 gap-0",
+        "cursor-pointer hover:shadow-md transition-shadow py-0 gap-0 min-w-0 overflow-hidden",
         (isDragging || isSortableDragging) && "opacity-50 shadow-lg"
       )}
       onClick={onClick}
       {...attributes}
       {...listeners}
     >
-      <CardContent className="px-2.5 py-2 space-y-0.5">
+      <CardContent className="px-2.5 py-2 space-y-0.5 overflow-hidden">
         <div className="flex items-center justify-between">
           <span className="font-medium text-sm truncate">
             {item.discord_username || "Anonymous"}
@@ -74,9 +74,9 @@ export function KanbanCard({ item, isDragging, onClick }: KanbanCardProps) {
         )}
 
         {item.notes && (
-          <div className="text-xs text-muted-foreground truncate">
+          <p className="text-xs text-muted-foreground truncate">
             {item.notes}
-          </div>
+          </p>
         )}
 
         <div className="flex items-center justify-between pt-1.5 mt-1.5 border-t">
