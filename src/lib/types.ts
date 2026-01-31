@@ -1,3 +1,16 @@
+// Time range for availability (24-hour format, e.g., "18:00" to "21:30")
+export interface TimeRange {
+  start: string // "HH:mm" format
+  end: string   // "HH:mm" format
+}
+
+// Availability is a weekly schedule with time ranges per day
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+
+export type Availability = {
+  [day in DayOfWeek]?: TimeRange[]
+}
+
 export type OrderStatus =
   | 'in_queue'
   | 'scheduled'
@@ -34,6 +47,7 @@ export interface Order {
   package_name: string
   amount: number
   refunded_amount: number | null
+  availability: Availability | null
   status: OrderStatus
   created_at: string
   updated_at: string
@@ -48,6 +62,7 @@ export interface QueueItem {
   package_id: string
   package_name: string
   status: QueueStatus
+  availability: Availability | null
   appointment_time: string | null
   room_code: string | null
   notes: string | null

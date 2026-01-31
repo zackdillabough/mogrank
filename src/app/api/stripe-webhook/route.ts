@@ -33,13 +33,27 @@ export async function POST(request: NextRequest) {
         }
 
         const metadata = session.metadata
-        if (!metadata) {
-          console.error("No metadata on checkout session:", session.id)
+        if (!metadata?.pending_checkout_id) {
+          console.error("No pending_checkout_id in metadata:", session.id)
           break
         }
 
-        const { discord_id, discord_username, discord_avatar, package_id, package_name } = metadata
+        // Fetch pending checkout data
+        const { data: pendingCheckout, error: pendingError } = await supabase
+          .from("pending_checkouts")
+          .select("*")
+          .eq("id", metadata.pending_checkout_id)
+          .single()
+
+        if (pendingError || !pendingCheckout) {
+          console.error("Pending checkout not found:", metadata.pending_checkout_id, pendingError)
+          return NextResponse.json({ error: "Pending checkout not found", details: pendingError }, { status: 500 })
+        }
+
+        const { discord_id, discord_username, discord_avatar, package_id, package_name, availability } = pendingCheckout
         const amount = (session.amount_total || 0) / 100 // Convert from cents
+
+        console.log("Creating order with data:", { discord_id, package_id, package_name, amount, availability })
 
         // Create order
         const { data: order, error: orderError } = await supabase
@@ -55,6 +69,7 @@ export async function POST(request: NextRequest) {
             package_id,
             package_name,
             amount,
+            availability,
             status: "in_queue",
             paid_at: new Date().toISOString(),
           })
@@ -63,7 +78,7 @@ export async function POST(request: NextRequest) {
 
         if (orderError) {
           console.error("Error creating order:", orderError)
-          break
+          return NextResponse.json({ error: "Failed to create order", details: orderError }, { status: 500 })
         }
 
         // Create queue item
@@ -73,6 +88,7 @@ export async function POST(request: NextRequest) {
           discord_username,
           package_id,
           package_name,
+          availability,
           status: "new",
         })
 
@@ -80,7 +96,12 @@ export async function POST(request: NextRequest) {
           console.error("Error creating queue item:", queueError)
         }
 
-        // Update order status to in_queue (already set, but keep consistent with queue creation)
+        // Delete pending checkout (cleanup)
+        await supabase
+          .from("pending_checkouts")
+          .delete()
+          .eq("id", metadata.pending_checkout_id)
+
         // Send Discord DM
         if (discord_id) {
           await sendDiscordDM(

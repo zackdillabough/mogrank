@@ -3,7 +3,16 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import type { Package } from "@/lib/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { AvailabilityGrid, normalizeAvailability } from "@/components/availability-grid"
+import type { Package, Availability } from "@/lib/types"
 
 const rotations = ["-2deg", "1.5deg", "-1deg", "2deg", "-0.5deg", "1deg"]
 
@@ -19,6 +28,9 @@ export function PackageCard({ package: pkg, index = 0, isLoggedIn }: PackageCard
   const [expanded, setExpanded] = useState(false)
   const [animating, setAnimating] = useState(false)
   const [cardRect, setCardRect] = useState<DOMRect | null>(null)
+  const [availabilityDialogOpen, setAvailabilityDialogOpen] = useState(false)
+  const [availability, setAvailability] = useState<Availability>({})
+  const [inCopyMode, setInCopyMode] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   const rotation = rotations[index % rotations.length]
@@ -54,19 +66,33 @@ export function PackageCard({ package: pkg, index = 0, isLoggedIn }: PackageCard
     return () => window.removeEventListener("keydown", handleKey)
   }, [expanded, handleCollapse])
 
-  const handleBuy = async (e: React.MouseEvent) => {
+  const handleBuyClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isLoggedIn) {
       router.push("/login")
       return
     }
+    // Open availability dialog instead of going directly to checkout
+    setAvailabilityDialogOpen(true)
+  }
+
+  const handleCheckout = async () => {
+    // Validate at least some availability is selected
+    const hasAvailability = Object.values(availability).some((hours) => hours && hours.length > 0)
+    if (!hasAvailability) {
+      alert("Please select at least one time slot when you're available.")
+      return
+    }
+
+    // Normalize availability (sort and merge overlapping ranges) before checkout
+    const normalizedAvailability = normalizeAvailability(availability)
 
     setLoading(true)
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId: pkg.id }),
+        body: JSON.stringify({ packageId: pkg.id, availability: normalizedAvailability }),
       })
 
       if (!response.ok) {
@@ -156,15 +182,47 @@ export function PackageCard({ package: pkg, index = 0, isLoggedIn }: PackageCard
               <Button
                 className="w-full"
                 size="lg"
-                onClick={handleBuy}
+                onClick={handleBuyClick}
                 disabled={loading}
               >
-                {loading ? "Creating Order..." : isLoggedIn ? "Buy Now" : "Login to Buy"}
+                {isLoggedIn ? "Buy Now" : "Login to Buy"}
               </Button>
             </div>
           </div>
         </>
       )}
+
+      {/* Availability selection dialog */}
+      <Dialog open={availabilityDialogOpen} onOpenChange={setAvailabilityDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Select Your Availability</DialogTitle>
+            <DialogDescription>
+              Choose the times when you&apos;re available for your {pkg.name} session.
+              We&apos;ll schedule your appointment based on these times.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto py-4 -mx-6 px-6">
+            <AvailabilityGrid
+              value={availability}
+              onChange={setAvailability}
+              onCopyModeChange={setInCopyMode}
+            />
+          </div>
+
+          {!inCopyMode && (
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setAvailabilityDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCheckout} disabled={loading}>
+                {loading ? "Processing..." : "Continue to Payment"}
+              </Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

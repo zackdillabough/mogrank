@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS orders (
   package_name TEXT NOT NULL,
   amount DECIMAL(10, 2) NOT NULL,
   refunded_amount DECIMAL(10, 2),
+  availability JSONB,
   status TEXT NOT NULL DEFAULT 'in_queue',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS queue (
   package_id UUID REFERENCES packages(id),
   package_name TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new',
+  availability JSONB,
   appointment_time TIMESTAMPTZ,
   room_code TEXT,
   notes TEXT,
@@ -147,6 +149,19 @@ CREATE TRIGGER update_settings_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+-- Pending checkouts table (stores checkout data before payment confirmation)
+CREATE TABLE IF NOT EXISTS pending_checkouts (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  stripe_session_id TEXT,
+  discord_id TEXT NOT NULL,
+  discord_username TEXT,
+  discord_avatar TEXT,
+  package_id UUID REFERENCES packages(id),
+  package_name TEXT NOT NULL,
+  availability JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_discord_id ON orders(discord_id);
@@ -157,6 +172,7 @@ CREATE INDEX IF NOT EXISTS idx_queue_order_id ON queue(order_id);
 CREATE INDEX IF NOT EXISTS idx_queue_discord_id ON queue(discord_id);
 CREATE INDEX IF NOT EXISTS idx_queue_appointment_time ON queue(appointment_time);
 CREATE INDEX IF NOT EXISTS idx_users_discord_id ON users(discord_id);
+CREATE INDEX IF NOT EXISTS idx_pending_checkouts_stripe_session_id ON pending_checkouts(stripe_session_id);
 
 -- Row Level Security (RLS)
 ALTER TABLE packages ENABLE ROW LEVEL SECURITY;
@@ -165,6 +181,9 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE queue ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE faqs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pending_checkouts ENABLE ROW LEVEL SECURITY;
+
+-- No public policies for pending_checkouts - only accessible via service role key
 
 -- Policies for packages (public read)
 CREATE POLICY "Packages are viewable by everyone" ON packages

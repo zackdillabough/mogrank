@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { AvailabilityDisplay } from "@/components/availability-display"
 import type { QueueItem, QueueStatus } from "@/lib/types"
 
 interface QueueItemDialogProps {
@@ -131,6 +132,15 @@ export function QueueItemDialog({
               {item.order_id}
             </div>
           </div>
+
+          {item.availability && Object.keys(item.availability).length > 0 && (
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-1">Availability</Label>
+              <div className="col-span-3">
+                <AvailabilityDisplay availability={item.availability} />
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Status</Label>

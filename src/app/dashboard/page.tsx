@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { AvailabilityEditor } from "@/components/availability-editor"
+import { CancelOrderButton } from "@/components/cancel-order-button"
 import { format, formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 
@@ -39,26 +41,6 @@ async function getCustomerData(discordId: string) {
   }
 }
 
-async function getQueuePosition(discordId: string) {
-  const supabase = getSupabaseAdmin()
-  // Get all items ahead in queue
-  const { data, count } = await supabase
-    .from("queue")
-    .select("*", { count: "exact" })
-    .in("status", ["new", "scheduled"])
-    .order("created_at", { ascending: true })
-
-  if (!data) return null
-
-  const userIndex = data.findIndex((item) => item.discord_id === discordId)
-  if (userIndex === -1) return null
-
-  return {
-    position: userIndex + 1,
-    total: count || data.length,
-  }
-}
-
 export default async function CustomerDashboard() {
   const session = await auth()
 
@@ -66,10 +48,7 @@ export default async function CustomerDashboard() {
     return null
   }
 
-  const [{ orders, queueItems }, queuePosition] = await Promise.all([
-    getCustomerData(session.user.discordId),
-    getQueuePosition(session.user.discordId),
-  ])
+  const { orders, queueItems } = await getCustomerData(session.user.discordId)
 
   const activeOrder = queueItems[0]
 
@@ -94,18 +73,6 @@ export default async function CustomerDashboard() {
                 <p className="text-sm text-muted-foreground">Package</p>
                 <p className="font-medium">{activeOrder.package_name}</p>
               </div>
-
-              {queuePosition && activeOrder.status === "new" && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Queue Position</p>
-                  <p className="font-medium text-2xl">
-                    #{queuePosition.position}{" "}
-                    <span className="text-sm text-muted-foreground">
-                      of {queuePosition.total}
-                    </span>
-                  </p>
-                </div>
-              )}
 
               {activeOrder.appointment_time && (
                 <div>
@@ -144,6 +111,24 @@ export default async function CustomerDashboard() {
               <div>
                 <p className="text-sm text-muted-foreground">Notes</p>
                 <p className="text-sm">{activeOrder.notes}</p>
+              </div>
+            )}
+
+            {/* Availability section */}
+            <AvailabilityEditor
+              orderId={activeOrder.order_id}
+              availability={activeOrder.availability}
+              canEdit={["new", "scheduled"].includes(activeOrder.status)}
+            />
+
+            {/* Cancel order section - shown for orders in new/scheduled status */}
+            {["new", "scheduled"].includes(activeOrder.status) && (
+              <div className="pt-4 border-t">
+                <CancelOrderButton
+                  orderId={activeOrder.order_id}
+                  orderAmount={Number(orders.find(o => o.id === activeOrder.order_id)?.amount || 0)}
+                  canCancel={["new", "scheduled"].includes(activeOrder.status)}
+                />
               </div>
             )}
           </CardContent>
