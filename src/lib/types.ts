@@ -33,6 +33,7 @@ export interface Package {
   image_url: string | null
   active: boolean
   position: number
+  estimated_duration: number // Duration in minutes
   created_at: string
 }
 
@@ -71,6 +72,24 @@ export interface QueueItem {
   position: number
   created_at: string
   updated_at: string
+  // Multi-session support
+  sessions?: Session[]
+}
+
+export type SessionStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'missed'
+
+export interface Session {
+  id: string
+  queue_id: string
+  session_number: number
+  status: SessionStatus
+  appointment_time: string | null
+  room_code: string | null
+  notes: string | null
+  proof_added: boolean
+  missed: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface User {
@@ -90,5 +109,28 @@ export interface FAQ {
   position: number
   active: boolean
   created_at: string
+}
+
+// Business hours for a single day
+export interface DayHours {
+  enabled: boolean
+  start: string // "HH:mm" format
+  end: string   // "HH:mm" format
+}
+
+// Business hours for the whole week
+export type BusinessHours = {
+  [day in DayOfWeek]: DayHours
+}
+
+// Default business hours (2 PM - 10 PM every day)
+export const DEFAULT_BUSINESS_HOURS: BusinessHours = {
+  sunday: { enabled: true, start: "14:00", end: "22:00" },
+  monday: { enabled: true, start: "14:00", end: "22:00" },
+  tuesday: { enabled: true, start: "14:00", end: "22:00" },
+  wednesday: { enabled: true, start: "14:00", end: "22:00" },
+  thursday: { enabled: true, start: "14:00", end: "22:00" },
+  friday: { enabled: true, start: "14:00", end: "22:00" },
+  saturday: { enabled: true, start: "14:00", end: "22:00" },
 }
 

@@ -43,11 +43,20 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
-    const { name, header, subtitle, description, price, image_url, active } = body
+    const { name, header, subtitle, description, price, image_url, active, estimated_duration } = body
 
     const { data, error } = await supabase
       .from("packages")
-      .insert({ name, header, subtitle, description, price, image_url, active: active ?? true })
+      .insert({
+        name,
+        header,
+        subtitle,
+        description,
+        price,
+        image_url,
+        active: active ?? true,
+        estimated_duration: estimated_duration ?? 60,
+      })
       .select()
       .single()
 

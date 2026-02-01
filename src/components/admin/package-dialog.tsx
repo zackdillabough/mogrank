@@ -30,6 +30,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
   const [description, setDescription] = useState(pkg?.description || "")
   const [price, setPrice] = useState(pkg?.price?.toString() || "")
   const [imageUrl, setImageUrl] = useState(pkg?.image_url || "")
+  const [estimatedDuration, setEstimatedDuration] = useState(pkg?.estimated_duration?.toString() || "60")
   const [active, setActive] = useState(pkg?.active ?? true)
 
   const isEditing = !!pkg
@@ -47,6 +48,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
         description: description || null,
         price: parseFloat(price),
         image_url: imageUrl || null,
+        estimated_duration: parseInt(estimatedDuration) || 60,
         active,
       }
 
@@ -77,6 +79,7 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
     setDescription(pkg?.description || "")
     setPrice(pkg?.price?.toString() || "")
     setImageUrl(pkg?.image_url || "")
+    setEstimatedDuration(pkg?.estimated_duration?.toString() || "60")
     setActive(pkg?.active ?? true)
   }
 
@@ -150,17 +153,31 @@ export function PackageDialog({ package: pkg, trigger, onSuccess }: PackageDialo
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="price">Price ($)</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="price">Price ($)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="estimatedDuration">Est. Duration (min)</Label>
+                <Input
+                  id="estimatedDuration"
+                  type="number"
+                  step="5"
+                  min="5"
+                  value={estimatedDuration}
+                  onChange={(e) => setEstimatedDuration(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
+import { CalendarDays, X } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AvailabilityDisplay } from "@/components/availability-display"
+import { WeekCalendar } from "@/components/admin/week-calendar"
+import { SessionsPanel } from "@/components/admin/sessions-panel"
 import type { QueueItem, QueueStatus } from "@/lib/types"
 
 interface QueueItemDialogProps {
@@ -37,57 +40,62 @@ export function QueueItemDialog({
   onOpenChange,
   onUpdate,
 }: QueueItemDialogProps) {
-  const [appointmentDate, setAppointmentDate] = useState("")
-  const [appointmentTime, setAppointmentTime] = useState("")
+  const [appointmentTime, setAppointmentTime] = useState<Date | null>(null)
   const [roomCode, setRoomCode] = useState("")
   const [notes, setNotes] = useState("")
   const [proofAdded, setProofAdded] = useState(false)
   const [status, setStatus] = useState<QueueStatus>("new")
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [showSessions, setShowSessions] = useState(false)
 
+  // Reset state when dialog opens/closes or item changes
   useEffect(() => {
-    if (item) {
+    if (item && open) {
       if (item.appointment_time) {
-        const date = new Date(item.appointment_time)
-        setAppointmentDate(format(date, "yyyy-MM-dd"))
-        setAppointmentTime(format(date, "HH:mm"))
+        setAppointmentTime(new Date(item.appointment_time))
       } else {
-        setAppointmentDate("")
-        setAppointmentTime("")
+        setAppointmentTime(null)
       }
       setRoomCode(item.room_code || "")
       setNotes(item.notes || "")
       setProofAdded(item.proof_added)
       setStatus(item.status)
+      setShowCalendar(false)
+      setShowSessions(false)
     }
-  }, [item])
+  }, [item, open])
 
   if (!item) return null
 
   const handleSave = () => {
-    let appointmentDateTime: string | null = null
-    if (appointmentDate && appointmentTime) {
-      appointmentDateTime = new Date(
-        `${appointmentDate}T${appointmentTime}`
-      ).toISOString()
-    }
-
     // Auto-determine status based on inputs
     let newStatus = status
-    if (roomCode && !appointmentDateTime) {
-      appointmentDateTime = new Date().toISOString()
+    if (roomCode && !appointmentTime) {
+      // If room code but no appointment, set to now and in_progress
+      const now = new Date()
+      setAppointmentTime(now)
       newStatus = "in_progress"
-    } else if (appointmentDateTime && newStatus === "new") {
-      newStatus = "scheduled"
+      onUpdate({
+        id: item.id,
+        appointment_time: now.toISOString(),
+        room_code: roomCode || null,
+        notes: notes || null,
+        proof_added: proofAdded,
+        status: newStatus,
+      })
+    } else {
+      if (appointmentTime && newStatus === "new") {
+        newStatus = "scheduled"
+      }
+      onUpdate({
+        id: item.id,
+        appointment_time: appointmentTime?.toISOString() || null,
+        room_code: roomCode || null,
+        notes: notes || null,
+        proof_added: proofAdded,
+        status: newStatus,
+      })
     }
-
-    onUpdate({
-      id: item.id,
-      appointment_time: appointmentDateTime,
-      room_code: roomCode || null,
-      notes: notes || null,
-      proof_added: proofAdded,
-      status: newStatus,
-    })
   }
 
   const handleMarkComplete = () => {
@@ -110,138 +118,205 @@ export function QueueItemDialog({
     })
   }
 
-  const handleSetNow = () => {
-    const now = new Date()
-    setAppointmentDate(format(now, "yyyy-MM-dd"))
-    setAppointmentTime(format(now, "HH:mm"))
+  const handleSelectTime = (date: Date) => {
+    setAppointmentTime(date)
+    setShowCalendar(false)
+  }
+
+  const handleClearAppointment = () => {
+    setAppointmentTime(null)
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className={(showCalendar || showSessions) ? "sm:max-w-[900px] max-h-[90vh] flex flex-col" : "max-w-md"}>
         <DialogHeader>
           <DialogTitle>
             {item.discord_username || "Anonymous"} - {item.package_name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Order ID</Label>
-            <div className="col-span-3 font-mono text-sm text-muted-foreground">
-              {item.order_id}
+        {showSessions ? (
+          // Multi-session view
+          <div className="flex-1 overflow-auto py-4">
+            <SessionsPanel
+              queueId={item.id}
+              availability={item.availability || null}
+            />
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setShowSessions(false)}>
+                Back to Details
+              </Button>
             </div>
           </div>
+        ) : showCalendar ? (
+          // Calendar view
+          <div className="flex-1 overflow-hidden py-4">
+            <WeekCalendar
+              availability={item.availability || null}
+              onSelectTime={handleSelectTime}
+              selectedTime={appointmentTime}
+              excludeItemId={item.id}
+            />
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={() => setShowCalendar(false)}>
+                Back to Details
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // Details view
+          <>
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Order ID</Label>
+                <div className="col-span-3 font-mono text-sm text-muted-foreground">
+                  {item.order_id}
+                </div>
+              </div>
 
-          {item.availability && Object.keys(item.availability).length > 0 && (
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label className="text-right pt-1">Availability</Label>
-              <div className="col-span-3">
-                <AvailabilityDisplay availability={item.availability} />
+              {item.availability && Object.keys(item.availability).length > 0 && (
+                <div className="grid grid-cols-4 items-start gap-4">
+                  <Label className="text-right pt-1">Availability</Label>
+                  <div className="col-span-3">
+                    <AvailabilityDisplay availability={item.availability} />
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Status</Label>
+                <Select value={status} onValueChange={(v) => setStatus(v as QueueStatus)}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">New</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="review">Review</SelectItem>
+                    <SelectItem value="finished">Finished</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Appointment scheduling */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Appointment</Label>
+                <div className="col-span-3">
+                  {appointmentTime ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 px-3 py-2 bg-muted rounded-md text-sm">
+                        {format(appointmentTime, "EEE, MMM d, yyyy 'at' h:mm a")}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearAppointment}
+                        className="h-8 w-8 p-0"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowCalendar(true)}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowCalendar(true)}
+                      className="w-full justify-start"
+                    >
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      Schedule Appointment
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Multi-session toggle */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Sessions</Label>
+                <div className="col-span-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSessions(true)}
+                    className="w-full justify-start"
+                  >
+                    <CalendarDays className="mr-2 h-4 w-4" />
+                    Manage Multiple Sessions
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    For orders requiring multiple appointments
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Room Code</Label>
+                <Input
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value)}
+                  placeholder="e.g., ABC123"
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Notes</Label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add any notes..."
+                  className="col-span-3"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Proof</Label>
+                <div className="col-span-3 flex items-center gap-2">
+                  <Checkbox
+                    id="proof"
+                    checked={proofAdded}
+                    onCheckedChange={(checked) => setProofAdded(checked === true)}
+                  />
+                  <Label htmlFor="proof" className="text-sm font-normal">
+                    Proof screenshot added
+                  </Label>
+                </div>
               </div>
             </div>
-          )}
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Status</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as QueueStatus)}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="new">New</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="review">Review</SelectItem>
-                <SelectItem value="finished">Finished</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Date</Label>
-            <div className="col-span-3 flex gap-2">
-              <Input
-                type="date"
-                value={appointmentDate}
-                onChange={(e) => setAppointmentDate(e.target.value)}
-                className="flex-1"
-              />
-              <Button variant="outline" size="sm" onClick={handleSetNow}>
-                Now
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              {item.status === "in_progress" || item.status === "review" ? (
+                <>
+                  <Button
+                    variant="destructive"
+                    onClick={handleMarkMissed}
+                    className="sm:mr-auto"
+                  >
+                    Mark Missed
+                  </Button>
+                  <Button
+                    onClick={handleMarkComplete}
+                    disabled={!proofAdded}
+                  >
+                    Complete Session
+                  </Button>
+                </>
+              ) : null}
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
               </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Time</Label>
-            <Input
-              type="time"
-              value={appointmentTime}
-              onChange={(e) => setAppointmentTime(e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Room Code</Label>
-            <Input
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value)}
-              placeholder="e.g., ABC123"
-              className="col-span-3"
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Notes</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes..."
-              className="col-span-3"
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Proof</Label>
-            <div className="col-span-3 flex items-center gap-2">
-              <Checkbox
-                id="proof"
-                checked={proofAdded}
-                onCheckedChange={(checked) => setProofAdded(checked === true)}
-              />
-              <Label htmlFor="proof" className="text-sm font-normal">
-                Proof screenshot added
-              </Label>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          {item.status === "in_progress" || item.status === "review" ? (
-            <>
-              <Button
-                variant="destructive"
-                onClick={handleMarkMissed}
-                className="sm:mr-auto"
-              >
-                Mark Missed
-              </Button>
-              <Button
-                onClick={handleMarkComplete}
-                disabled={!proofAdded}
-              >
-                Complete Session
-              </Button>
-            </>
-          ) : null}
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
-        </DialogFooter>
+              <Button onClick={handleSave}>Save Changes</Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

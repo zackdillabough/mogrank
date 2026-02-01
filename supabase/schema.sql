@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS packages (
   image_url TEXT,
   active BOOLEAN DEFAULT true,
   position INTEGER NOT NULL DEFAULT 0,
+  estimated_duration INTEGER DEFAULT 60, -- Duration in minutes
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -72,6 +73,24 @@ CREATE TABLE IF NOT EXISTS queue (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT valid_queue_status CHECK (status IN (
     'new', 'scheduled', 'in_progress', 'review', 'finished'
+  ))
+);
+
+-- Sessions table (individual sessions for multi-session orders)
+CREATE TABLE IF NOT EXISTS sessions (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  queue_id UUID REFERENCES queue(id) ON DELETE CASCADE,
+  session_number INTEGER NOT NULL DEFAULT 1,
+  status TEXT NOT NULL DEFAULT 'pending',
+  appointment_time TIMESTAMPTZ,
+  room_code TEXT,
+  notes TEXT,
+  proof_added BOOLEAN DEFAULT false,
+  missed BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT valid_session_status CHECK (status IN (
+    'pending', 'scheduled', 'in_progress', 'completed', 'missed'
   ))
 );
 
@@ -149,6 +168,11 @@ CREATE TRIGGER update_settings_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_sessions_updated_at
+  BEFORE UPDATE ON sessions
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
 -- Pending checkouts table (stores checkout data before payment confirmation)
 CREATE TABLE IF NOT EXISTS pending_checkouts (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -173,6 +197,8 @@ CREATE INDEX IF NOT EXISTS idx_queue_discord_id ON queue(discord_id);
 CREATE INDEX IF NOT EXISTS idx_queue_appointment_time ON queue(appointment_time);
 CREATE INDEX IF NOT EXISTS idx_users_discord_id ON users(discord_id);
 CREATE INDEX IF NOT EXISTS idx_pending_checkouts_stripe_session_id ON pending_checkouts(stripe_session_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_queue_id ON sessions(queue_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_appointment_time ON sessions(appointment_time);
 
 -- Row Level Security (RLS)
 ALTER TABLE packages ENABLE ROW LEVEL SECURITY;
@@ -182,6 +208,7 @@ ALTER TABLE queue ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE faqs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pending_checkouts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 
 -- No public policies for pending_checkouts - only accessible via service role key
 
@@ -252,6 +279,16 @@ CREATE POLICY "FAQs are viewable by everyone" ON faqs
   FOR SELECT USING (active = true);
 
 CREATE POLICY "Only admins can modify FAQs" ON faqs
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM users
+      WHERE discord_id = current_setting('request.jwt.claims')::json->>'discord_id'
+      AND is_admin = true
+    )
+  );
+
+-- Policies for sessions (admin only, accessed via service role typically)
+CREATE POLICY "Admins can manage all sessions" ON sessions
   FOR ALL USING (
     EXISTS (
       SELECT 1 FROM users
