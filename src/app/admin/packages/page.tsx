@@ -59,6 +59,7 @@ function SortableRow({ pkg, onDelete, onSuccess }: { pkg: Package; onDelete: (id
       <TableCell>{pkg.header}</TableCell>
       <TableCell>{pkg.subtitle}</TableCell>
       <TableCell>${Number(pkg.price).toFixed(2)}</TableCell>
+      <TableCell className="text-muted-foreground">{pkg.estimated_duration} min</TableCell>
       <TableCell>
         <Badge variant={pkg.active ? "default" : "secondary"}>
           {pkg.active ? "Active" : "Inactive"}
@@ -177,6 +178,7 @@ export default function PackagesPage() {
               <TableHead>Header</TableHead>
               <TableHead>Subtitle</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Duration</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -186,7 +188,7 @@ export default function PackagesPage() {
               <TableBody>
                 {packages.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No packages yet. Create one to get started.
                     </TableCell>
                   </TableRow>
