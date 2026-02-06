@@ -241,10 +241,10 @@ function PolaroidFrame({ pkg, expanded = false }: { pkg: Package; expanded?: boo
         {/* Dark radial gradient for text readability */}
         <div className="absolute inset-0 bg-radial-[at_center] from-black/60 via-black/30 to-transparent" />
         <div className="relative z-10 flex flex-col items-center text-center">
-          <p className="text-5xl font-bold text-white drop-shadow-lg">
+          <p className="text-6xl sm:text-5xl font-bold text-white drop-shadow-lg">
             {pkg.header}
           </p>
-          <p className="text-base text-zinc-300 mt-1">{pkg.subtitle}</p>
+          <p className="text-lg sm:text-base text-zinc-300 mt-1">{pkg.subtitle}</p>
           {pkg.description && (
             <div
               className="overflow-hidden transition-all duration-300 ease-out"
